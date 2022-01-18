@@ -13,8 +13,8 @@
 
         <!-- static assets -->
         <link type="image/x-icon" rel="icon" href="favicon.ico">
-        <script type="text/javacript" charset="utf-8"  src="public/app.js"></script>
-        <link rel="stylesheet" type="text/css" href="public/style.css"/>
+        <script type="text/javascript" charset="utf-8"  src="public/app.js"></script>
+        <link rel="stylesheet" type="text/css" href="public/app.css"/>
     </head>
     <body class="{body.class}">
         <!-- page wrapper  -->
@@ -23,15 +23,17 @@
             <!-- header -->
             <div class="header">
                 <!-- logo -->
-                <a href="/" class="logo"></a>
+                <a href="/" class="logo">
+                    <img src="public/logo.png" alt="logo">
+                </a>
                 <!-- Navigation -->
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a class="loggedOut" href="/">Signup</a></li>
-                    <li><a class="loggedOut" href="/">Login</a></li>
-                    <li><a class="loggedIn" href="/">Dashboard</a></li>
-                    <li><a class="loggedIn"  href="/">Account Settings</a></li>
-                    <li><a class="loggedIn" href="/">Logout</a></li>
+                    <li><a class="loggedOut" href="/account/create">Signup</a></li>
+                    <li><a class="loggedOut" href="/session/create">Login</a></li>
+                    <li><a class="loggedIn" href="/checks/all">Dashboard</a></li>
+                    <li><a class="loggedIn"  href="/account/edit">Account Settings</a></li>
+                    <li><a class="loggedIn" href="#">Logout</a></li>
                 </ul>
             </div>
 
