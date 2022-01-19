@@ -122,23 +122,36 @@ app.bindForms = function(){
         for(var i = 0; i < elements.length; i++){
           if(elements[i].type !== 'submit'){
             var valueOfElement = elements[i].type == 'checkbox' ? elements[i].checked : elements[i].value;
-            payload[elements[i].name] = valueOfElement;
+            if(elements[i].name === '_method'){
+              method = valueOfElement
+            } else {
+              payload[elements[i].name] = valueOfElement;
+            } 
           }
         }
+
+        // If the method is DELETE, the payload should be a queryStringObject instead
+        var queryStringObject = method == 'DELETE' ? payload : {};
   
         // Call the API
         app.client.request(undefined,path,method,undefined,payload,function(statusCode,responsePayload){
           // Display an error on the form if needed
           if(statusCode !== 200){
+            
+            if(statusCode === 403){
+               // Try to get the error from the api, or set a default error message
+               var error = typeof(responsePayload.Error) == 'string' ? responsePayload.Error : 'An error has occured, please try again';
   
-            // Try to get the error from the api, or set a default error message
-            var error = typeof(responsePayload.Error) == 'string' ? responsePayload.Error : 'An error has occured, please try again';
+               // Set the formError field with the error text
+                document.querySelector("#"+formId+" .formError").innerHTML = error;
   
-            // Set the formError field with the error text
-            document.querySelector("#"+formId+" .formError").innerHTML = error;
-  
-            // Show (unhide) the form error field on the form
-            document.querySelector("#"+formId+" .formError").style.display = 'block';
+               // Show (unhide) the form error field on the form
+                document.querySelector("#"+formId+" .formError").style.display = 'block';
+            } else {
+                // If successful, send to form response processor
+                app.formResponseProcessor(formId,payload,responsePayload);
+            }
+            
   
           } else {
             // If successful, send to form response processor
@@ -182,6 +195,17 @@ app.formResponseProcessor = function(formId,requestPayload,responsePayload){
     if(formId == 'sessionCreate'){
       app.setSessionToken(responsePayload);
       window.location = '/checks/all';
+    }
+    // If forms saved successfully and they have success messages, show them
+    var formsWithSuccessMessages = ['accountEdit1', 'accountEdit2'];
+    if(formsWithSuccessMessages.indexOf(formId) > -1){
+      document.querySelector("#"+formId+" .formSuccess").style.display = 'block';
+    }
+
+    // If the user just deleted their account, redirect them to the account-delete page
+    if(formId == 'accountEdit3'){
+      app.logUserOut(false);
+      window.location = '/account/deleted';
     }
 };
   
