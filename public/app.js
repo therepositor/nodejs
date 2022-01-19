@@ -70,59 +70,38 @@ app.client.request = (headers,path,method,queryStringObject,payload,callback) =>
     const payloadString = JSON.stringify(payload);
     xhr.send(payloadString);
 }
-// // Bind the forms
-// app.bindForms = function(){
-//     document.querySelector("form").addEventListener("submit", function(e){
-  
-//       // Stop it from submitting
-//       e.preventDefault();
-//       var formId = this.id;
-//       var path = this.action;
-//       var method = this.method.toUpperCase();
-  
-//       // Hide the error message (if it's currently shown due to a previous error)
-//       document.querySelector("#"+formId+" .formError").style.display = 'hidden';
-  
-//       // Turn the inputs into a payload
-//       var payload = {};
-//       var elements = this.elements;
-//       for(var i = 0; i < elements.length; i++){
-//         if(elements[i].type !== 'submit'){
-//           var valueOfElement = elements[i].type == 'checkbox' ? elements[i].checked : elements[i].value;
-//           payload[elements[i].name] = valueOfElement;
-//         }
-//       }
-  
-//       // Call the API
-//       app.client.request(undefined,path,method,undefined,payload,function(statusCode,responsePayload){
-//         // Display an error on the form if needed
-//         if(statusCode !== 200){
-  
-//           // Try to get the error from the api, or set a default error message
-//           var error = typeof(responsePayload.Error) == 'string' ? responsePayload.Error : 'An error has occured, please try again';
-  
-//           // Set the formError field with the error text
-//           document.querySelector("#"+formId+" .formError").innerHTML = error;
-  
-//           // Show (unhide) the form error field on the form
-//           document.querySelector("#"+formId+" .formError").style.display = 'block';
-  
-//         } else {
-//           // If successful, send to form response processor
-//           app.formResponseProcessor(formId,payload,responsePayload);
-//         }
-  
-//       });
-//     });
-// };
-// // Form response processor
-// app.formResponseProcessor = function(formId,requestPayload,responsePayload){
-//     var functionToCall = false;
-//     if(formId == 'accountCreate'){
-//       // @TODO Do something here now that the account has been created successfully
-//     }
-// };
 
+// Bind the logout button
+app.bindLogoutButton = function(){
+    document.getElementById("logoutButton").addEventListener("click", function(e){
+  
+      // Stop it from redirecting anywhere
+      e.preventDefault();
+  
+      // Log the user out
+      app.logUserOut();
+  
+    });
+};
+  
+// Log the user out then redirect them
+app.logUserOut = function(){
+    // Get the current token id
+    var tokenId = typeof(app.config.sessionToken.id) == 'string' ? app.config.sessionToken.id : false;
+  
+    // Send the current token to the tokens endpoint to delete it
+    var queryStringObject = {
+      'id' : tokenId
+    };
+    app.client.request(undefined,'api/tokens','DELETE',queryStringObject,undefined,function(statusCode,responsePayload){
+      // Set the app.config token as false
+      app.setSessionToken(false);
+  
+      // Send the user to the logged out page
+      window.location = '/session/deleted';
+  
+    });
+};
 // Bind the forms
 app.bindForms = function(){
     if(document.querySelector("form")){
@@ -169,10 +148,10 @@ app.bindForms = function(){
         });
       });
     }
-  };
+};
   
-  // Form response processor
-  app.formResponseProcessor = function(formId,requestPayload,responsePayload){
+// Form response processor
+app.formResponseProcessor = function(formId,requestPayload,responsePayload){
     var functionToCall = false;
     // If account creation was successful, try to immediately log the user in
     if(formId == 'accountCreate'){
@@ -204,10 +183,10 @@ app.bindForms = function(){
       app.setSessionToken(responsePayload);
       window.location = '/checks/all';
     }
-  };
+};
   
-  // Get the session token from localstorage and set it in the app.config object
-  app.getSessionToken = function(){
+// Get the session token from localstorage and set it in the app.config object
+app.getSessionToken = function(){
     var tokenString = localStorage.getItem('token');
     if(typeof(tokenString) == 'string'){
       try{
@@ -223,20 +202,20 @@ app.bindForms = function(){
         app.setLoggedInClass(false);
       }
     }
-  };
+};
   
-  // Set (or remove) the loggedIn class from the body
-  app.setLoggedInClass = function(add){
+// Set (or remove) the loggedIn class from the body
+app.setLoggedInClass = function(add){
     var target = document.querySelector("body");
     if(add){
       target.classList.add('loggedIn');
     } else {
       target.classList.remove('loggedIn');
     }
-  };
+};
   
-  // Set the session token in the app.config object as well as localstorage
-  app.setSessionToken = function(token){
+// Set the session token in the app.config object as well as localstorage
+app.setSessionToken = function(token){
     app.config.sessionToken = token;
     var tokenString = JSON.stringify(token);
     localStorage.setItem('token',tokenString);
@@ -245,9 +224,9 @@ app.bindForms = function(){
     } else {
       app.setLoggedInClass(false);
     }
-  };
+};
   
-  // Renew the token
+// Renew the token
   app.renewToken = function(callback){
     var currentToken = typeof(app.config.sessionToken) == 'object' ? app.config.sessionToken : false;
     if(currentToken){
