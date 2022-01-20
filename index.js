@@ -2,6 +2,7 @@
 
 const server = require('./lib/server');
 const workers = require('./lib/workers');
+const cli = require('./lib/cli');
 
 
 // declare the app
@@ -15,6 +16,10 @@ app.init = () => {
     // start the worker
     workers.init();
     
+    // start the cli, but make sure it starts last
+    setTimeout(() => {
+        cli.init();
+    }, 50);
 }
 // execute
 app.init();
