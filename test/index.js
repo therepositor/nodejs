@@ -12,6 +12,7 @@ _app.tests = {};
 
 // Add on the unit tests
 _app.tests.unit = require('./unit')
+_app.tests.api = require('./api')
 
 
 // count all test
@@ -99,7 +100,7 @@ _app.produceTestReport = (limit,successes,errors) => {
 
     console.log('');
     console.log('---------------------End TEST REPORT---------------------');
-    
+    process.exit(0);
 }
 
 
