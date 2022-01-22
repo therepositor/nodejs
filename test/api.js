@@ -9,7 +9,7 @@ const http = require('http');
 const assert = require('assert');
 const config = require('./../lib/config');
 const helpers = require('../lib/helpers');
-const { defaultMaxListeners } = require('events');
+
 
 // Holder for the test
 const api = {};
